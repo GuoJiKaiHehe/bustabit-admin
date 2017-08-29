@@ -1,0 +1,24 @@
+export default function({isClient,isServer,route,req,res,redirect,store}){
+	/*if(isServer){
+		if(route.path.indexOf('login')==-1){
+			if(!req.session.admin){
+				redirect('/login')
+			}
+		}
+	}
+	if(isClient){
+		if(route.path.indexOf('login')==-1){
+			if(!req.session.admin){
+				redirect('/login')
+			}
+		}
+	}*/
+	//如果是登录页面
+	if(isServer){
+		if(!route.path.match("login")){
+			if(!req.session.admin){
+				redirect("/login");
+			}
+		}
+	}
+}
