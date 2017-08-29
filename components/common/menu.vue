@@ -10,73 +10,71 @@
 	<!-- Sidebar Menu -->
 	<ul class="nav sidebar-menu">
 		<!--Dashboard-->
-		<li>
+		<li v-for="menu in menus" @click="handleSlide">
 			<a href="#" class="menu-dropdown">
-				<i class="menu-icon fa fa-user"></i>
-				<span class="menu-text">管理员</span>
+				<i :class="menu.iconClass"></i>
+				<span class="menu-text">{{menu.text}}</span>
 				<i class="menu-expand"></i>
 			</a>
-			<ul class="submenu">
-				<li>
-					<nuxt-link :to="{path:'/admin'}">
+			<ul class="submenu" v-if="menu.children"  >
+				<li v-for="submenu in menu.children">
+					<nuxt-link :to="{path:submenu.path}">
 						<span class="menu-text">
-							管理列表                                    </span>
+							{{submenu.text}}                                    </span>
 						<i class="menu-expand"></i>
 					</nuxt-link>
 				</li>
-				<li>
-					<nuxt-link :to="{path:'/admin'}">
-						<span class="menu-text">
-							管理员角色列表                                </span>
-						<i class="menu-expand"></i>
-					</nuxt-link>
-				</li>
+				
 			</ul>                            
 		</li> 
 
-		<li>
-			<a href="#" class="menu-dropdown">
-				<i class="menu-icon fa fa-file-text"></i>
-				<span class="menu-text">文档</span>
-				<i class="menu-expand"></i>
-			</a>
-			<ul class="submenu">
-				<li>
-					<a href="/admin/document/index.html">
-						<span class="menu-text">
-							文章列表                                    </span>
-						<i class="menu-expand"></i>
-					</a>
-				</li>
-			</ul>                            
-		</li> 
-
-		<li>
-			<a href="#" class="menu-dropdown">
-				<i class="menu-icon fa fa-gear"></i>
-				<span class="menu-text">系统</span>
-				<i class="menu-expand"></i>
-			</a>
-			<ul class="submenu">
-				<li>
-					<a href="/admin/document/index.html">
-						<span class="menu-text">
-							配置                                   </span>
-						<i class="menu-expand"></i>
-					</a>
-				</li>
-			</ul>                            
-		</li>                        
-		
-		<li>
-			<a href="http://www.chuanke.com/s2260700.html" class="menu-dropdown">
-				<i class="menu-icon fa fa-gear"></i>
-				<span class="menu-text">Tp5视频教程</span>
-				<i class="menu-expand"></i>
-			</a>                           
-		</li>                         
+		                       
 		
 	</ul>
 	<!-- /Sidebar Menu -->
 </div>
 </template>
+
+<script type="text/javascript">
+	export default{
+		data(){
+			return {
+				menus:[{
+							text:"管理员",
+							iconClass:"menu-icon fa fa-user",
+							children:[
+								{text:"管理员列表",path:"/admin"},
+								{text:"管理角色",path:"/admin"},
+								{text:"管理权限",path:"/admin"}
+							]
+						},
+						{
+							text:"文档",
+							iconClass:"menu-icon fa fa-file-text",
+							children:[
+								{text:"文章列表",path:"/article"},
+							]
+						},{
+							text:"系统",
+							iconClass:"menu-icon fa fa-gear",
+							children:[
+								{text:"基本配置",path:'setting'}
+							]
+						}]
+				
+				}
+		},
+		methods:{
+			handleSlide(e){
+				$(e.target)
+			}
+		},
+		mounted(){
+			
+		}
+	}
+</script>
+
+<style type="text/css">
+	
+</style>

@@ -41,7 +41,7 @@ export default {
 		      .catch(e => {
 		        client.release()
 		        console.log(e.stack)
-		        cb(e.stack);
+		        cb(e);
 		      })
 		  })
 	},

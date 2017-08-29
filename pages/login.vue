@@ -29,12 +29,12 @@
 
 <script type="text/javascript">
 import axios from 'axios';
-import remind from '~/components/parts/remind'
+
 import {mapActions} from 'vuex'
 	export default{
 		layout:"login",
 		components:{
-			remind
+			
 		},
 		data(){
 			return {
@@ -85,7 +85,7 @@ import {mapActions} from 'vuex'
 					})
 					return;
 				}
-
+				this.$store.state.isShowLoading=true;
 				axios({
 					method:"post",
 					url:"/api/admin/login",
@@ -95,6 +95,7 @@ import {mapActions} from 'vuex'
 						captchaCode:this.captchaCode
 					}
 				}).then((res)=>{
+					this.$store.state.isShowLoading=false;
 					console.log(res);
 					if(res.data.error==0){
 						// alert("333");
@@ -116,6 +117,7 @@ import {mapActions} from 'vuex'
 						})
 					}
 				}).catch((err)=>{
+					this.$store.state.isShowLoading=false;
 					if(err){
 						this.showRemind({
 							icon:"error",

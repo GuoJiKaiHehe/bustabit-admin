@@ -5,5 +5,7 @@ export default (app) => {
  	// app.use("/api",users);
  	
 
-	app.use("/api/admin",AdminRouter);
+ 		app.use("/api/admin",AdminRouter);
+
+	
 }

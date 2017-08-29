@@ -26,7 +26,7 @@
             <!-- /Page Content -->
     </div> 
     <loading></loading> 
-    
+    <remind :remindData="$store.state.remindData"></remind>
   </div>
 </template>
 
@@ -42,7 +42,8 @@ export default {
  	 BHeader,
     BMenu,
     confirm,
-    remind
+    remind,
+    loading
   },
   head () {
     return {

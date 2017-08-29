@@ -39,8 +39,12 @@ module.exports = {
   /*
   ** Add axios globally
   */
+  //插件
+  plugins: [
+     { src: '~plugins/vue-notifications', ssr: false }
+  ],
   build: {
-    vendor: ['axios'],
+    vendor: ['axios','vue-notifications'],
     /*
     ** Run ESLINT on save
     */
