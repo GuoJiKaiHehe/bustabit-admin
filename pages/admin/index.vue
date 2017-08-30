@@ -35,7 +35,7 @@
               <div>
               </div>
                <div class="paginate-wrap">
-                  <paginate></paginate>
+                  <paginate :pageData="pageData" @click="handlePageSize" ></paginate>
              </div>
 
             </div>
@@ -62,42 +62,89 @@
         default:function(){
           return []
         }
+      },
+      pageData:{
+        type:Object
       }
+    },
+    data(){
+      return {
+        
+      }
+    },
+    mounted(){
+      this.totalData
+    },
+    computed:{
+     
     },
     methods:{
       ...mapActions([
-          'showRemind'
+          'showRemind',
+          'showConfirm'
         ]),
+      handlePageSize(e,page){
+        //点击的是第几页；
+        var options={};
+        options.page=page;
+   
+        this.$emit("clickPage",options,(err,ret)=>{
+            //在这设置admins；
+            // this.admins=[];
+              this.pageData.page=page;
+              this.admins.splice(0,this.admins.length);
+              ret.admins.forEach((item)=>{
+                this.admins.push(item);
+              })
+            // this.admin
+            /*if(err){
+               this.admins=[];
+            }else{
+              this.admins=[];
+              // this.admins=ret.admins;
+              this.pageData.page=page;
+              // this.pageData.total=ret.total; 
+            }*/
+        });
+      },
       handleEdit(e,id){
         console.log(id);
         this.$router.push({path:"/admin/edit",query:{id:id}})
       },
       handleDel(e,id){
-        axios({
-          method:"post",
-          url:"/api/admin/del",
-          data:{
-            id:id
-          }
-        }).then((res)=>{
-          // console.log(res);
-            if(res.data.error==0){
-              this.showRemind({icon:'success',text:"管理员"+res.data.result.username +"已被删除"});
-              
-              for(var i=0;i<this.admins.length;i++){
-                if(this.admins[i].id==id){
-                  this.admins.splice(i,1);
-                  break;
-                }
-              }
-            }else{
-              this.showRemind({icon:"error",text:res.data.result})
+        var _this=this;
+        _this.showConfirm({
+          text:"你确定要删除么？",
+          title:"删除管理员",
+          todoFn(){
+          axios({
+            method:"post",
+            url:"/api/admin/del",
+            data:{
+              id:id
             }
-        }).catch((err)=>{
-          console.log(err);
-          // alert("3333");
-            this.showRemind({icon:"error",text:err});
-        })
+          }).then((res)=>{
+            // console.log(res);
+              if(res.data.error==0){
+                _this.showRemind({icon:'success',text:"管理员"+res.data.result.username +"已被删除"});
+                
+                for(var i=0;i<_this.admins.length;i++){
+                  if(_this.admins[i].id==id){
+                    _this.admins.splice(i,1);
+                    break;
+                  }
+                }
+              }else{
+                _this.showRemind({icon:"error",text:res.data.result})
+              }
+          }).catch((err)=>{
+            console.log(err);
+            // alert("3333");
+              _this.showRemind({icon:"error",text:err});
+          })
+            }
+          })
+        
       }
     }
   }

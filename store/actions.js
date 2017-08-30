@@ -10,5 +10,8 @@ export default{
 		if(req.session.admin){
 			commit('setAdmin',req.session.admin)
 		}
+	},
+	showConfirm({commit},obj){
+		commit("showConfirm",obj);
 	}
 }

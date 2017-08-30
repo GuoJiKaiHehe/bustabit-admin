@@ -30,6 +30,10 @@ export default {
 	// query:(text, params) => pool.query(text, params),
 	//await db.query('SELECT * FROM users WHERE id = $1', [id])
 	query(sql,params,cb){
+		if(typeof params =='function'){
+			cb=params;
+			params=[];
+		}
 		pool.connect()
 		  .then(client => {
 		    return client.query(sql, params)

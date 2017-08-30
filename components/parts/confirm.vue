@@ -1,15 +1,14 @@
 <template>
-	<div class="k-confirm" :style="dialogWrapStyle" v-if="isShowConfirm" >
+	<div class="k-confirm" :style="dialogWrapStyle" v-if="confirmData.isShow" >
 		<div class="mask"  :style="{backgroundColor:maskColor}"></div>
 		<div class="k-confirm-container">
 			<div class="ktitle">
-				<slot name="title"></slot>
+				<div class="title-text" v-html="confirmData.title"></div>
 				<a 	@click="handleClose" href="javascript:;" class="btn-close">
 					X
 				</a>
 			</div>
-			<div class="kbody">
-				<slot name="body"></slot>
+			<div class="kbody" v-html="confirmData.text" >
 			</div>
 			<div class="kfooter button-group">
 				<div class="btn-wrap">
@@ -32,9 +31,8 @@ import kbutton from '~/components/parts/kbutton'
 			kbutton
 		},
 		props:{
-			isShowConfirm:{
-				type:Boolean,
-				default:true
+			confirmData:{
+				type:Object
 			},
 			maskColor:{
 				type:String,
@@ -58,10 +56,13 @@ import kbutton from '~/components/parts/kbutton'
 		},
 		methods:{
 			handleClose(e){
-				this.emit("close",e)
+				this.confirmData.isShow=false;
 			},
 			handleSure(e){
-				this.emit("sure",e)
+				// alert("333");
+				// this.emit("sure",e)
+				this.confirmData.todoFn && this.confirmData.todoFn();
+				this.handleClose();
 			}
 		}
 

@@ -142,8 +142,39 @@ router.post("/create",function(req,res,next){
 	});
 })
 router.post("/getAdmins",async function(req,res){
-	let admins=await Admin.getAdmins();
-	res.send(admins)
+	/**
+	 total:
+	*/
+	// let keyword='';
+	let fields=[];
+	let where={};
+	let options={};
+	let page=1;
+	let limit =10;
+	if(req.body.keyword){
+		where.text=" username LIKE  $1";
+		where.values=[ "%"+req.body.keyword+'%'];
+	}
+	if(req.body.page){
+		page=req.body.page;
+	}
+	options.offset=(page-1)*limit;
+	
+	let result=await Admin.getAdmins(fields,where,options);
+	// console.log(result);
+	if(result.error){
+		return res.json({
+				error:1,
+				result:result.error
+			})
+	}
+	res.json({
+		error:0,
+		result:{
+			admins:result.data.admins,
+			total:result.data.total			
+		}
+	})
 })
 //管理员退出！
 router.get("/quit",function(req,res){
@@ -161,7 +192,7 @@ router.get("/quit",function(req,res){
 	})*/
 })
 
-//修改保存；
+//修改get数据；
 router.post("/edit",function(req,res){
 	var id=req.body.id;
 	if(!id){
@@ -205,6 +236,73 @@ router.post("/edit",function(req,res){
 				})
 			}
 	})*/
+})
+router.post("/save",function(req,res){
+	let id=req.body.id;
+	let username=req.body.username.trim();
+	let password=req.body.password.trim();
+	let repassword=req.body.repassword.trim();
+	let email=req.body.email.trim();
+	
+	let tasks=[
+		function(cb){
+			if(validator.isEqual(password,repassword)){
+				cb(null);
+			}else{
+				cb("密码与确认密码不一致");
+			}
+		},
+		function(cb){
+			if(validator.checkUserName(username)){
+				cb(null);
+			}else{
+				cb("用户名格式不正确")
+			}
+		},
+		function(cb){
+			if(validator.checkPassword(password) || password=='' ){
+				cb(null)
+			}else{
+				cb("密码格式不正确")
+			}
+		},
+		function(cb){
+			if(validator.checkEmail(email)){
+				cb(null)
+			}else{
+				cb("邮箱格式不正确")
+			}
+		}
+	];
+	async.parallel(tasks,function(err,result){
+		if(err){
+			res.json({
+				error:3,
+				result:err
+			})
+		}
+	})
+
+	let set={
+		username:username,
+		email:email
+	}
+	if(password){
+		set.password=passwordHash.generate(password);
+	}
+	Admin.findOneByIdAndUpdate(id,set,function(err,admin){
+		if(err){
+			return res.json({
+					error:2,
+					result:err.task
+				})
+		}else{
+			return res.json({
+					error:0,
+					result:admin
+				})
+		}
+	})
 })
 router.post("/del",function(req,res){
 	var id=req.body.id;

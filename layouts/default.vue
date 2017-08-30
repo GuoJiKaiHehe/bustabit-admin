@@ -27,6 +27,7 @@
     </div> 
     <loading></loading> 
     <remind :remindData="$store.state.remindData"></remind>
+    <confirm :confirmData="$store.state.confirmData"></confirm>
   </div>
 </template>
 

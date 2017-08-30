@@ -16,5 +16,9 @@ export default{
 	seta(state,data){
 		state.a=data;
 		console.log("3333333");
+	},
+	showConfirm:function(state,obj){
+		obj.isShow=true;
+		state.confirmData=obj;
 	}
 }

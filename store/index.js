@@ -12,7 +12,15 @@ const state={
 		text:1000
 	},
 	admin:null,
-	a:null
+	a:null,
+	confirmData:{
+		todoFn:null,
+		isShow:false,
+		text:"",
+		icon:"",
+		title:"abcd"
+
+	}
 };
 
 

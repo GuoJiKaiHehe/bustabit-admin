@@ -141,6 +141,15 @@ Admin.create=function(obj,cb){
 		})
 }
 Admin.getAdmins=function(fields,w,options){
+	/* 多条件查询
+		select * from admin 
+		where 
+			(id='41' AND username LIKE 'te%') 
+		OR  
+			(email='970228812@qq.ccom') 
+		OR 
+			(username = 'guojikai');
+	*/
 	return new Promise((resolve,reject)=>{
 		var where='';
 		var limit=10;
@@ -148,14 +157,14 @@ Admin.getAdmins=function(fields,w,options){
 		var selectFields='*';
 		var values=[];
 		var offsetString="";
-		if(w){	
-			values=Object.values(w);
-			for(var k in w){
-				where+=k+"=$1,"
-			}
-			where="WHERE "+where.slice(0,-1);
+		var or={};
+		var and={};
+		var like={};
+		if(JSON.stringify(w)!="{}"){	
+			 where="WHERE "+w.text;
+			 values=w.values;
 		}
-		if(fields){
+		if(fields.length){
 			selectFields=fields.join(",");
 		}
 		if(options){
@@ -170,13 +179,26 @@ Admin.getAdmins=function(fields,w,options){
 		var limitString="LIMIT "+limit;
 
 		let sql="SELECT "+selectFields+" FROM admin "+where +' '+orderBy+' '+limitString +' '+offsetString;
-		console.log(sql);
+		console.log(sql,values);
 		db.query(sql,values,function(err,ret){
 			if(err){
 				return resolve({error:err.stack})
 			}else{
-				return resolve({error:null,result:ret.rows});
-				
+				let sqlCount="SELECT COUNT(id) as count FROM admin "+where;
+				db.query(sqlCount,values,function(err,retCount){
+					if(err){
+						return resolve({error:err.stack})
+					}else{
+						return resolve({
+							error:null,
+							data:{
+								admins:ret.rows,
+								total:retCount.rows[0].count
+							}
+						});
+					}
+				})
+
 			}
 
 		});	
@@ -185,22 +207,34 @@ Admin.getAdmins=function(fields,w,options){
 
 Admin.findOneByIdAndUpdate=function(id,setW,cb){
 	var _this=this;
+	var finded=null;
+// console.log(setW);
+	let set="";
+	let values=[];
 	let tasks=[
 		function(cb){
 
-			_this.getAdminById(id,function(err,data){
+			_this.getAdminById(id,function(err,admin){
 				if(err){
 					return cb(err)
 				}else{
-					return cb(null,data)
+					return cb(null,admin)
 				}
 			})
 		},
 		function(cb){
-			var set=setW.$set;
-
-			let sql="UPDATE admin  SET  WHERE id=$1";
-			db.query(sql,[id],function(err,ret){
+			
+			values=Object.values(setW);
+			Object.keys(setW).forEach((key,i)=>{
+				set+=key+"=$"+(i+1)+","
+			})
+			
+			set=set.slice(0,-1);
+			console.log("set+"+set)
+			let sql="UPDATE admin  SET "+set +"  WHERE id=$"+ (parseInt(Object.keys(setW).length)+1);
+			console.log(sql);
+			values.push(id);
+			db.query(sql,values,function(err,ret){
 				if(err){
 					return cb(err);
 				}else{
@@ -215,9 +249,10 @@ Admin.findOneByIdAndUpdate=function(id,setW,cb){
 		}else{
 			if(ret[0].length>0){
 				//找到了；
-
+				finded=ret[0];
+				return cb(null,finded);
 			}else{
-				cb('没有找到此人')
+				return cb('没有找到此人')
 			}
 		}
 	})
@@ -250,9 +285,13 @@ Admin.findOneByIdAndRemove=function(id,cb){
 		if(err){
 			return cb(err)	
 		}else{
-			finded=ret[0];
-			console.log(finded)
-			return cb(null,finded);
+			if(ret.length==0){
+				cb('不存在此人')
+			}else{
+				finded=ret[0];
+				// console.log(finded)
+				return cb(null,finded);	
+			}
 		}
 	})	
 }
